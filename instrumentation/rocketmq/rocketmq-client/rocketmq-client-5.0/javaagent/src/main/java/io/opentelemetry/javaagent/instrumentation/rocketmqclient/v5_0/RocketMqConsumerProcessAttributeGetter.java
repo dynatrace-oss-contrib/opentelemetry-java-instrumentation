@@ -28,12 +28,6 @@ enum RocketMqConsumerProcessAttributeGetter
     return messageView.getTopic();
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(MessageView messageView) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(MessageView messageView) {
     return false;
@@ -42,12 +36,6 @@ enum RocketMqConsumerProcessAttributeGetter
   @Override
   public boolean isAnonymousDestination(MessageView messageView) {
     return false;
-  }
-
-  @Nullable
-  @Override
-  public String getConversationId(MessageView messageView) {
-    return null;
   }
 
   @Nullable
@@ -71,12 +59,6 @@ enum RocketMqConsumerProcessAttributeGetter
   @Nullable
   @Override
   public String getClientId(MessageView messageView) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Long getBatchMessageCount(MessageView messageView, @Nullable ConsumeResult unused) {
     return null;
   }
 

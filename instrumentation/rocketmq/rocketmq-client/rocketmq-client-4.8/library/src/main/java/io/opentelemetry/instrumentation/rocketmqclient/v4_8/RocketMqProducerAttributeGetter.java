@@ -29,12 +29,6 @@ enum RocketMqProducerAttributeGetter
     return message == null ? null : message.getTopic();
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(SendMessageContext request) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(SendMessageContext request) {
     return false;
@@ -43,12 +37,6 @@ enum RocketMqProducerAttributeGetter
   @Override
   public boolean isAnonymousDestination(SendMessageContext request) {
     return false;
-  }
-
-  @Nullable
-  @Override
-  public String getConversationId(SendMessageContext request) {
-    return null;
   }
 
   @Nullable
@@ -73,12 +61,6 @@ enum RocketMqProducerAttributeGetter
   @Nullable
   @Override
   public String getClientId(SendMessageContext request) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Long getBatchMessageCount(SendMessageContext request, @Nullable Void unused) {
     return null;
   }
 

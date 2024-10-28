@@ -24,12 +24,6 @@ enum RabbitChannelAttributesGetter implements MessagingAttributesGetter<ChannelA
     return null;
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(ChannelAndMethod channelAndMethod) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(ChannelAndMethod channelAndMethod) {
     return false;
@@ -38,12 +32,6 @@ enum RabbitChannelAttributesGetter implements MessagingAttributesGetter<ChannelA
   @Override
   public boolean isAnonymousDestination(ChannelAndMethod channelAndMethod) {
     return false;
-  }
-
-  @Nullable
-  @Override
-  public String getConversationId(ChannelAndMethod channelAndMethod) {
-    return null;
   }
 
   @Nullable
@@ -67,12 +55,6 @@ enum RabbitChannelAttributesGetter implements MessagingAttributesGetter<ChannelA
   @Nullable
   @Override
   public String getClientId(ChannelAndMethod channelAndMethod) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Long getBatchMessageCount(ChannelAndMethod channelAndMethod, @Nullable Void unused) {
     return null;
   }
 

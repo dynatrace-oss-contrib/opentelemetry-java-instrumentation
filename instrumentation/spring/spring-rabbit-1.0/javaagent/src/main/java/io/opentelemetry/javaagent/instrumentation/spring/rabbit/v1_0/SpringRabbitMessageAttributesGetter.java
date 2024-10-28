@@ -25,12 +25,6 @@ enum SpringRabbitMessageAttributesGetter implements MessagingAttributesGetter<Me
     return message.getMessageProperties().getReceivedRoutingKey();
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(Message message) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(Message message) {
     return false;
@@ -39,12 +33,6 @@ enum SpringRabbitMessageAttributesGetter implements MessagingAttributesGetter<Me
   @Override
   public boolean isAnonymousDestination(Message message) {
     return false;
-  }
-
-  @Override
-  @Nullable
-  public String getConversationId(Message message) {
-    return null;
   }
 
   @Override
@@ -67,12 +55,6 @@ enum SpringRabbitMessageAttributesGetter implements MessagingAttributesGetter<Me
   @Nullable
   @Override
   public String getClientId(Message message) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Long getBatchMessageCount(Message message, @Nullable Void unused) {
     return null;
   }
 

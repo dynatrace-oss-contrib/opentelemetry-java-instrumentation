@@ -28,12 +28,6 @@ enum PulsarBatchMessagingAttributesGetter
     return request.getDestination();
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(PulsarBatchRequest request) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(PulsarBatchRequest request) {
     return false;
@@ -42,12 +36,6 @@ enum PulsarBatchMessagingAttributesGetter
   @Override
   public boolean isAnonymousDestination(PulsarBatchRequest request) {
     return false;
-  }
-
-  @Nullable
-  @Override
-  public String getConversationId(PulsarBatchRequest message) {
-    return null;
   }
 
   @Nullable

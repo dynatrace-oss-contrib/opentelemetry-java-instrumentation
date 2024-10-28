@@ -38,12 +38,6 @@ enum SqsReceiveRequestAttributesGetter
     return null;
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(SqsReceiveRequest request) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(SqsReceiveRequest request) {
     return false;
@@ -52,12 +46,6 @@ enum SqsReceiveRequestAttributesGetter
   @Override
   public boolean isAnonymousDestination(SqsReceiveRequest request) {
     return false;
-  }
-
-  @Override
-  @Nullable
-  public String getConversationId(SqsReceiveRequest request) {
-    return null;
   }
 
   @Nullable

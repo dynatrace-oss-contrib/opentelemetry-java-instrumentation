@@ -31,12 +31,6 @@ enum KafkaProducerAttributesGetter
     return request.getRecord().topic();
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(KafkaProducerRequest request) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(KafkaProducerRequest request) {
     return false;
@@ -45,12 +39,6 @@ enum KafkaProducerAttributesGetter
   @Override
   public boolean isAnonymousDestination(KafkaProducerRequest request) {
     return false;
-  }
-
-  @Override
-  @Nullable
-  public String getConversationId(KafkaProducerRequest request) {
-    return null;
   }
 
   @Nullable
@@ -76,13 +64,6 @@ enum KafkaProducerAttributesGetter
   @Override
   public String getClientId(KafkaProducerRequest request) {
     return request.getClientId();
-  }
-
-  @Nullable
-  @Override
-  public Long getBatchMessageCount(
-      KafkaProducerRequest request, @Nullable RecordMetadata recordMetadata) {
-    return null;
   }
 
   @Override

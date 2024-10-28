@@ -27,12 +27,6 @@ enum RocketMqConsumerReceiveAttributeGetter
     return request.getMessageQueue().getTopic().getName();
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(ReceiveMessageRequest request) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(ReceiveMessageRequest request) {
     return false;
@@ -41,12 +35,6 @@ enum RocketMqConsumerReceiveAttributeGetter
   @Override
   public boolean isAnonymousDestination(ReceiveMessageRequest request) {
     return false;
-  }
-
-  @Nullable
-  @Override
-  public String getConversationId(ReceiveMessageRequest request) {
-    return null;
   }
 
   @Nullable

@@ -30,12 +30,6 @@ enum RabbitReceiveAttributesGetter
     }
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(ReceiveRequest request) {
-    return null;
-  }
-
   private static String normalizeExchangeName(String exchange) {
     return exchange == null || exchange.isEmpty() ? "<default>" : exchange;
   }
@@ -48,12 +42,6 @@ enum RabbitReceiveAttributesGetter
   @Override
   public boolean isAnonymousDestination(ReceiveRequest request) {
     return false;
-  }
-
-  @Nullable
-  @Override
-  public String getConversationId(ReceiveRequest request) {
-    return null;
   }
 
   @Nullable
@@ -77,12 +65,6 @@ enum RabbitReceiveAttributesGetter
   @Nullable
   @Override
   public String getClientId(ReceiveRequest request) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Long getBatchMessageCount(ReceiveRequest request, @Nullable GetResponse response) {
     return null;
   }
 

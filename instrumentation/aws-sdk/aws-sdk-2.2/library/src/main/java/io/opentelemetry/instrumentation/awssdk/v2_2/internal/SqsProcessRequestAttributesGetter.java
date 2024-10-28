@@ -37,12 +37,6 @@ enum SqsProcessRequestAttributesGetter
     return null;
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(SqsProcessRequest request) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(SqsProcessRequest request) {
     return false;
@@ -51,12 +45,6 @@ enum SqsProcessRequestAttributesGetter
   @Override
   public boolean isAnonymousDestination(SqsProcessRequest request) {
     return false;
-  }
-
-  @Override
-  @Nullable
-  public String getConversationId(SqsProcessRequest request) {
-    return null;
   }
 
   @Nullable
@@ -80,12 +68,6 @@ enum SqsProcessRequestAttributesGetter
   @Nullable
   @Override
   public String getClientId(SqsProcessRequest request) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Long getBatchMessageCount(SqsProcessRequest request, @Nullable Response response) {
     return null;
   }
 

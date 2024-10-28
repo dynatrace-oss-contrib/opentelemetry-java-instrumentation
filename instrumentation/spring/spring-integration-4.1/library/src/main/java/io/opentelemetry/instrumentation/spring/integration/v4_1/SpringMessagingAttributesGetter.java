@@ -27,12 +27,6 @@ enum SpringMessagingAttributesGetter
     return null;
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(MessageWithChannel messageWithChannel) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(MessageWithChannel messageWithChannel) {
     return false;
@@ -41,12 +35,6 @@ enum SpringMessagingAttributesGetter
   @Override
   public boolean isAnonymousDestination(MessageWithChannel messageWithChannel) {
     return false;
-  }
-
-  @Override
-  @Nullable
-  public String getConversationId(MessageWithChannel messageWithChannel) {
-    return null;
   }
 
   @Nullable
@@ -70,12 +58,6 @@ enum SpringMessagingAttributesGetter
   @Nullable
   @Override
   public String getClientId(MessageWithChannel messageWithChannel) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Long getBatchMessageCount(MessageWithChannel messageWithChannel, @Nullable Void unused) {
     return null;
   }
 

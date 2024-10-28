@@ -25,12 +25,6 @@ enum KafkaConsumerAttributesGetter implements MessagingAttributesGetter<KafkaPro
     return request.getRecord().topic();
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(KafkaProcessRequest request) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(KafkaProcessRequest request) {
     return false;
@@ -39,12 +33,6 @@ enum KafkaConsumerAttributesGetter implements MessagingAttributesGetter<KafkaPro
   @Override
   public boolean isAnonymousDestination(KafkaProcessRequest request) {
     return false;
-  }
-
-  @Override
-  @Nullable
-  public String getConversationId(KafkaProcessRequest request) {
-    return null;
   }
 
   @Nullable
@@ -70,12 +58,6 @@ enum KafkaConsumerAttributesGetter implements MessagingAttributesGetter<KafkaPro
   @Override
   public String getClientId(KafkaProcessRequest request) {
     return request.getClientId();
-  }
-
-  @Nullable
-  @Override
-  public Long getBatchMessageCount(KafkaProcessRequest request, @Nullable Void unused) {
-    return null;
   }
 
   @Override

@@ -24,12 +24,6 @@ enum RocketMqConsumerAttributeGetter implements MessagingAttributesGetter<Messag
     return request.getTopic();
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(MessageExt request) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(MessageExt request) {
     return false;
@@ -38,12 +32,6 @@ enum RocketMqConsumerAttributeGetter implements MessagingAttributesGetter<Messag
   @Override
   public boolean isAnonymousDestination(MessageExt request) {
     return false;
-  }
-
-  @Nullable
-  @Override
-  public String getConversationId(MessageExt request) {
-    return null;
   }
 
   @Nullable
@@ -68,12 +56,6 @@ enum RocketMqConsumerAttributeGetter implements MessagingAttributesGetter<Messag
   @Nullable
   @Override
   public String getClientId(MessageExt request) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Long getBatchMessageCount(MessageExt request, @Nullable Void unused) {
     return null;
   }
 

@@ -29,12 +29,6 @@ enum JmsMessageAttributesGetter implements MessagingAttributesGetter<MessageWith
     return messageWithDestination.destinationName();
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(MessageWithDestination messageWithDestination) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(MessageWithDestination messageWithDestination) {
     return messageWithDestination.isTemporaryDestination();
@@ -82,13 +76,6 @@ enum JmsMessageAttributesGetter implements MessagingAttributesGetter<MessageWith
   @Nullable
   @Override
   public String getClientId(MessageWithDestination messageWithDestination) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Long getBatchMessageCount(
-      MessageWithDestination messageWithDestination, @Nullable Void unused) {
     return null;
   }
 

@@ -33,12 +33,6 @@ enum KafkaReceiveAttributesGetter implements MessagingAttributesGetter<KafkaRece
     return topics.size() == 1 ? topics.iterator().next() : null;
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(KafkaReceiveRequest request) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(KafkaReceiveRequest request) {
     return false;
@@ -47,12 +41,6 @@ enum KafkaReceiveAttributesGetter implements MessagingAttributesGetter<KafkaRece
   @Override
   public boolean isAnonymousDestination(KafkaReceiveRequest request) {
     return false;
-  }
-
-  @Override
-  @Nullable
-  public String getConversationId(KafkaReceiveRequest request) {
-    return null;
   }
 
   @Nullable

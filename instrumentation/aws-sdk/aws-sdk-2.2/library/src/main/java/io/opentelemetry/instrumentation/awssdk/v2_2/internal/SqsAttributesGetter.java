@@ -37,12 +37,6 @@ enum SqsAttributesGetter implements MessagingAttributesGetter<ExecutionAttribute
     return null;
   }
 
-  @Nullable
-  @Override
-  public String getDestinationTemplate(ExecutionAttributes request) {
-    return null;
-  }
-
   @Override
   public boolean isTemporaryDestination(ExecutionAttributes request) {
     return false;
@@ -51,12 +45,6 @@ enum SqsAttributesGetter implements MessagingAttributesGetter<ExecutionAttribute
   @Override
   public boolean isAnonymousDestination(ExecutionAttributes request) {
     return false;
-  }
-
-  @Override
-  @Nullable
-  public String getConversationId(ExecutionAttributes request) {
-    return null;
   }
 
   @Nullable
@@ -84,12 +72,6 @@ enum SqsAttributesGetter implements MessagingAttributesGetter<ExecutionAttribute
   @Nullable
   @Override
   public String getClientId(ExecutionAttributes request) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Long getBatchMessageCount(ExecutionAttributes request, @Nullable Response response) {
     return null;
   }
 

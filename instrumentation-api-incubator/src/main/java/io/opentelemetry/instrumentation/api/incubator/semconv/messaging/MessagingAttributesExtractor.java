@@ -11,8 +11,10 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
+import io.opentelemetry.instrumentation.api.internal.SemconvStability;
 import io.opentelemetry.instrumentation.api.internal.SpanKey;
 import io.opentelemetry.instrumentation.api.internal.SpanKeyProvider;
+import io.opentelemetry.semconv.ServerAttributes;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -27,43 +29,60 @@ import javax.annotation.Nullable;
 public final class MessagingAttributesExtractor<REQUEST, RESPONSE>
     implements AttributesExtractor<REQUEST, RESPONSE>, SpanKeyProvider {
 
-  // copied from MessagingIncubatingAttributes
+  // copied from MessagingIncubatingAttributes (stable attributes)
+  private static final AttributeKey<String> MESSAGING_OPERATION_NAME =
+      AttributeKey.stringKey("messaging.operation.name");
+  private static final AttributeKey<String> MESSAGING_SYSTEM =
+      AttributeKey.stringKey("messaging.system");
   private static final AttributeKey<Long> MESSAGING_BATCH_MESSAGE_COUNT =
       AttributeKey.longKey("messaging.batch.message_count");
-  private static final AttributeKey<String> MESSAGING_CLIENT_ID =
-      AttributeKey.stringKey("messaging.client_id");
+  // Messaging specific
+  private static final AttributeKey<String> MESSAGING_CONSUMER_GROUP_NAME =
+      AttributeKey.stringKey("messaging.consumer.group.name");
   private static final AttributeKey<Boolean> MESSAGING_DESTINATION_ANONYMOUS =
       AttributeKey.booleanKey("messaging.destination.anonymous");
   private static final AttributeKey<String> MESSAGING_DESTINATION_NAME =
       AttributeKey.stringKey("messaging.destination.name");
-  private static final AttributeKey<String> MESSAGING_DESTINATION_PARTITION_ID =
-      AttributeKey.stringKey("messaging.destination.partition.id");
+  // Messaging specific
+  private static final AttributeKey<String> MESSAGING_DESTINATION_SUBSCRIPTION_NAME =
+      AttributeKey.stringKey("messaging.destination.subscription.name");
   private static final AttributeKey<String> MESSAGING_DESTINATION_TEMPLATE =
       AttributeKey.stringKey("messaging.destination.template");
   private static final AttributeKey<Boolean> MESSAGING_DESTINATION_TEMPORARY =
       AttributeKey.booleanKey("messaging.destination.temporary");
-  private static final AttributeKey<Long> MESSAGING_MESSAGE_BODY_SIZE =
-      AttributeKey.longKey("messaging.message.body.size");
+  private static final AttributeKey<String> MESSAGING_OPERATION_TYPE =
+      AttributeKey.stringKey("messaging.operation.type");
+  private static final AttributeKey<String> MESSAGING_CLIENT_ID_STABLE =
+      AttributeKey.stringKey("messaging.client.id");
+  private static final AttributeKey<String> MESSAGING_DESTINATION_PARTITION_ID =
+      AttributeKey.stringKey("messaging.destination.partition.id");
   private static final AttributeKey<String> MESSAGING_MESSAGE_CONVERSATION_ID =
       AttributeKey.stringKey("messaging.message.conversation_id");
-  private static final AttributeKey<Long> MESSAGING_MESSAGE_ENVELOPE_SIZE =
-      AttributeKey.longKey("messaging.message.envelope.size");
   private static final AttributeKey<String> MESSAGING_MESSAGE_ID =
       AttributeKey.stringKey("messaging.message.id");
+  private static final AttributeKey<Long> MESSAGING_MESSAGE_BODY_SIZE =
+      AttributeKey.longKey("messaging.message.body.size");
+  private static final AttributeKey<Long> MESSAGING_MESSAGE_ENVELOPE_SIZE =
+      AttributeKey.longKey("messaging.message.envelope.size");
+
+  // copied from MessagingIncubatingAttributes (old attributes)
+  private static final AttributeKey<String> MESSAGING_CLIENT_ID =
+      AttributeKey.stringKey("messaging.client_id");
   private static final AttributeKey<String> MESSAGING_OPERATION =
       AttributeKey.stringKey("messaging.operation");
-  private static final AttributeKey<String> MESSAGING_SYSTEM =
-      AttributeKey.stringKey("messaging.system");
 
   static final String TEMP_DESTINATION_NAME = "(temporary)";
+  static final String ANONYMOUS_DESTINATION_NAME = "(temporary)";
 
   /**
    * Creates the messaging attributes extractor for the given {@link MessageOperation operation}
    * with default configuration.
    */
   public static <REQUEST, RESPONSE> AttributesExtractor<REQUEST, RESPONSE> create(
-      MessagingAttributesGetter<REQUEST, RESPONSE> getter, MessageOperation operation) {
-    return builder(getter, operation).build();
+      MessagingAttributesGetter<REQUEST, RESPONSE> getter,
+      MessagingNetworkAttributesGetter<REQUEST, RESPONSE> networkAttributesGetter,
+      MessageOperation operation) {
+    return builder(getter, networkAttributesGetter, operation).build();
   }
 
   /**
@@ -71,19 +90,24 @@ public final class MessagingAttributesExtractor<REQUEST, RESPONSE>
    * operation} that can be used to configure the messaging attributes extractor.
    */
   public static <REQUEST, RESPONSE> MessagingAttributesExtractorBuilder<REQUEST, RESPONSE> builder(
-      MessagingAttributesGetter<REQUEST, RESPONSE> getter, MessageOperation operation) {
-    return new MessagingAttributesExtractorBuilder<>(getter, operation);
+      MessagingAttributesGetter<REQUEST, RESPONSE> getter,
+      MessagingNetworkAttributesGetter<REQUEST, RESPONSE> networkAttributesGetter,
+      MessageOperation operation) {
+    return new MessagingAttributesExtractorBuilder<>(getter, networkAttributesGetter, operation);
   }
 
   private final MessagingAttributesGetter<REQUEST, RESPONSE> getter;
+  private final MessagingNetworkAttributesGetter<REQUEST, RESPONSE> networkAttributesGetter;
   private final MessageOperation operation;
   private final List<String> capturedHeaders;
 
   MessagingAttributesExtractor(
       MessagingAttributesGetter<REQUEST, RESPONSE> getter,
+      MessagingNetworkAttributesGetter<REQUEST, RESPONSE> networkAttributesGetter,
       MessageOperation operation,
       List<String> capturedHeaders) {
     this.getter = getter;
+    this.networkAttributesGetter = networkAttributesGetter;
     this.operation = operation;
     this.capturedHeaders = CapturedMessageHeadersUtil.lowercase(capturedHeaders);
   }
@@ -91,29 +115,49 @@ public final class MessagingAttributesExtractor<REQUEST, RESPONSE>
   @Override
   public void onStart(AttributesBuilder attributes, Context parentContext, REQUEST request) {
     internalSet(attributes, MESSAGING_SYSTEM, getter.getSystem(request));
+
+    // Old messaging attributes
+    if (SemconvStability.emitOldMessagingSemconv()) {
+      internalSet(attributes, MESSAGING_CLIENT_ID, getter.getClientId(request));
+      internalSet(attributes, MESSAGING_OPERATION, operation.operationName());
+    }
+
+    // New, stable attributes
+    if (SemconvStability.emitStableMessagingSemconv()) {
+      internalSet(attributes, MESSAGING_CLIENT_ID_STABLE, getter.getClientId(request));
+      internalSet(attributes, MESSAGING_OPERATION_TYPE, operation.operationType());
+      internalSet(attributes, MESSAGING_OPERATION_NAME, getter.getOperationName(request));
+      internalSet(attributes, MESSAGING_CONSUMER_GROUP_NAME, getter.getConsumerGroupName(request));
+      internalSet(attributes, MESSAGING_DESTINATION_SUBSCRIPTION_NAME,
+          getter.getConsumerGroupName(request));
+
+      internalSet(attributes, ServerAttributes.SERVER_ADDRESS,
+          networkAttributesGetter.getServerAddress(request));
+      Integer serverPort = networkAttributesGetter.getServerPort(request);
+      internalSet(attributes, ServerAttributes.SERVER_PORT,
+          serverPort == null ? null : Long.valueOf(serverPort));
+    }
+
+    // Unchanged attributes from 1.25.0 to stable
     boolean isTemporaryDestination = getter.isTemporaryDestination(request);
+    boolean isAnonymousDestination = getter.isAnonymousDestination(request);
+
     if (isTemporaryDestination) {
       internalSet(attributes, MESSAGING_DESTINATION_TEMPORARY, true);
       internalSet(attributes, MESSAGING_DESTINATION_NAME, TEMP_DESTINATION_NAME);
+    } else if (isAnonymousDestination) {
+      internalSet(attributes, MESSAGING_DESTINATION_ANONYMOUS, true);
+      internalSet(attributes, MESSAGING_DESTINATION_NAME, ANONYMOUS_DESTINATION_NAME);
     } else {
       internalSet(attributes, MESSAGING_DESTINATION_NAME, getter.getDestination(request));
       internalSet(
           attributes, MESSAGING_DESTINATION_TEMPLATE, getter.getDestinationTemplate(request));
     }
+
     internalSet(
         attributes, MESSAGING_DESTINATION_PARTITION_ID, getter.getDestinationPartitionId(request));
-    boolean isAnonymousDestination = getter.isAnonymousDestination(request);
-    if (isAnonymousDestination) {
-      internalSet(attributes, MESSAGING_DESTINATION_ANONYMOUS, true);
-    }
+
     internalSet(attributes, MESSAGING_MESSAGE_CONVERSATION_ID, getter.getConversationId(request));
-    internalSet(attributes, MESSAGING_MESSAGE_BODY_SIZE, getter.getMessageBodySize(request));
-    internalSet(
-        attributes, MESSAGING_MESSAGE_ENVELOPE_SIZE, getter.getMessageEnvelopeSize(request));
-    internalSet(attributes, MESSAGING_CLIENT_ID, getter.getClientId(request));
-    if (operation != null) {
-      internalSet(attributes, MESSAGING_OPERATION, operation.operationName());
-    }
   }
 
   @Override
@@ -126,6 +170,10 @@ public final class MessagingAttributesExtractor<REQUEST, RESPONSE>
     internalSet(attributes, MESSAGING_MESSAGE_ID, getter.getMessageId(request, response));
     internalSet(
         attributes, MESSAGING_BATCH_MESSAGE_COUNT, getter.getBatchMessageCount(request, response));
+
+    internalSet(attributes, MESSAGING_MESSAGE_BODY_SIZE, getter.getMessageBodySize(request));
+    internalSet(
+        attributes, MESSAGING_MESSAGE_ENVELOPE_SIZE, getter.getMessageEnvelopeSize(request));
 
     for (String name : capturedHeaders) {
       List<String> values = getter.getMessageHeader(request, name);
@@ -146,6 +194,10 @@ public final class MessagingAttributesExtractor<REQUEST, RESPONSE>
     }
 
     switch (operation) {
+      case CREATE:
+        return SpanKey.PRODUCER;
+      case SEND:
+        return SpanKey.PRODUCER;
       case PUBLISH:
         return SpanKey.PRODUCER;
       case RECEIVE:
