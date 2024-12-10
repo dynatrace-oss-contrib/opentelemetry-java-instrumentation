@@ -59,12 +59,19 @@ enum RabbitReceiveAttributesGetter
   @Nullable
   @Override
   public String getMessageId(ReceiveRequest request, @Nullable GetResponse response) {
+    if (response != null) {
+      return response.getProps().getMessageId();
+    }
     return null;
   }
 
   @Nullable
   @Override
   public String getClientId(ReceiveRequest request) {
+    GetResponse response = request.getResponse();
+    if (response != null) {
+      return response.getProps().getAppId();
+    }
     return null;
   }
 
@@ -72,7 +79,7 @@ enum RabbitReceiveAttributesGetter
   public List<String> getMessageHeader(ReceiveRequest request, String name) {
     GetResponse response = request.getResponse();
     if (response != null) {
-      Object value = request.getResponse().getProps().getHeaders().get(name);
+      Object value = response.getProps().getHeaders().get(name);
       if (value != null) {
         return Collections.singletonList(value.toString());
       }

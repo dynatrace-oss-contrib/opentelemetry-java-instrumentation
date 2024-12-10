@@ -72,7 +72,7 @@ public final class MessagingAttributesExtractor<REQUEST, RESPONSE>
       AttributeKey.stringKey("messaging.operation");
 
   static final String TEMP_DESTINATION_NAME = "(temporary)";
-  static final String ANONYMOUS_DESTINATION_NAME = "(temporary)";
+  static final String ANONYMOUS_DESTINATION_NAME = "(anonymous)";
 
   /**
    * Creates the messaging attributes extractor for the given {@link MessageOperation operation}
@@ -80,9 +80,8 @@ public final class MessagingAttributesExtractor<REQUEST, RESPONSE>
    */
   public static <REQUEST, RESPONSE> AttributesExtractor<REQUEST, RESPONSE> create(
       MessagingAttributesGetter<REQUEST, RESPONSE> getter,
-      MessagingNetworkAttributesGetter<REQUEST, RESPONSE> networkAttributesGetter,
       MessageOperation operation) {
-    return builder(getter, networkAttributesGetter, operation).build();
+    return builder(getter, operation).build();
   }
 
   /**
@@ -91,23 +90,19 @@ public final class MessagingAttributesExtractor<REQUEST, RESPONSE>
    */
   public static <REQUEST, RESPONSE> MessagingAttributesExtractorBuilder<REQUEST, RESPONSE> builder(
       MessagingAttributesGetter<REQUEST, RESPONSE> getter,
-      MessagingNetworkAttributesGetter<REQUEST, RESPONSE> networkAttributesGetter,
       MessageOperation operation) {
-    return new MessagingAttributesExtractorBuilder<>(getter, networkAttributesGetter, operation);
+    return new MessagingAttributesExtractorBuilder<>(getter, operation);
   }
 
   private final MessagingAttributesGetter<REQUEST, RESPONSE> getter;
-  private final MessagingNetworkAttributesGetter<REQUEST, RESPONSE> networkAttributesGetter;
   private final MessageOperation operation;
   private final List<String> capturedHeaders;
 
   MessagingAttributesExtractor(
       MessagingAttributesGetter<REQUEST, RESPONSE> getter,
-      MessagingNetworkAttributesGetter<REQUEST, RESPONSE> networkAttributesGetter,
       MessageOperation operation,
       List<String> capturedHeaders) {
     this.getter = getter;
-    this.networkAttributesGetter = networkAttributesGetter;
     this.operation = operation;
     this.capturedHeaders = CapturedMessageHeadersUtil.lowercase(capturedHeaders);
   }
@@ -130,12 +125,6 @@ public final class MessagingAttributesExtractor<REQUEST, RESPONSE>
       internalSet(attributes, MESSAGING_CONSUMER_GROUP_NAME, getter.getConsumerGroupName(request));
       internalSet(attributes, MESSAGING_DESTINATION_SUBSCRIPTION_NAME,
           getter.getConsumerGroupName(request));
-
-      internalSet(attributes, ServerAttributes.SERVER_ADDRESS,
-          networkAttributesGetter.getServerAddress(request));
-      Integer serverPort = networkAttributesGetter.getServerPort(request);
-      internalSet(attributes, ServerAttributes.SERVER_PORT,
-          serverPort == null ? null : Long.valueOf(serverPort));
     }
 
     // Unchanged attributes from 1.25.0 to stable

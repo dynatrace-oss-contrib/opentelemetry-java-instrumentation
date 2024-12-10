@@ -15,16 +15,13 @@ import java.util.List;
 public final class MessagingAttributesExtractorBuilder<REQUEST, RESPONSE> {
 
   final MessagingAttributesGetter<REQUEST, RESPONSE> getter;
-  final MessagingNetworkAttributesGetter<REQUEST, RESPONSE> networkAttributesGetter;
   final MessageOperation operation;
   List<String> capturedHeaders = emptyList();
 
   MessagingAttributesExtractorBuilder(
       MessagingAttributesGetter<REQUEST, RESPONSE> getter,
-      MessagingNetworkAttributesGetter<REQUEST, RESPONSE> networkAttributesGetter,
       MessageOperation operation) {
     this.getter = getter;
-    this.networkAttributesGetter = networkAttributesGetter;
     this.operation = operation;
   }
 
@@ -49,6 +46,6 @@ public final class MessagingAttributesExtractorBuilder<REQUEST, RESPONSE> {
    * MessagingAttributesExtractorBuilder}.
    */
   public AttributesExtractor<REQUEST, RESPONSE> build() {
-    return new MessagingAttributesExtractor<>(getter, networkAttributesGetter, operation, capturedHeaders);
+    return new MessagingAttributesExtractor<>(getter, operation, capturedHeaders);
   }
 }

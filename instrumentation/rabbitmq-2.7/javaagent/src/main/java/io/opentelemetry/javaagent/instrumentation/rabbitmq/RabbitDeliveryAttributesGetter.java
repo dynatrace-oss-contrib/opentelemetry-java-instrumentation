@@ -63,13 +63,13 @@ enum RabbitDeliveryAttributesGetter implements MessagingAttributesGetter<Deliver
   @Nullable
   @Override
   public String getMessageId(DeliveryRequest request, @Nullable Void unused) {
-    return null;
+    return request.getProperties().getMessageId();
   }
 
   @Nullable
   @Override
   public String getClientId(DeliveryRequest request) {
-    return null;
+    return request.getProperties().getAppId();
   }
 
   @Override

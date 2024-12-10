@@ -5,7 +5,9 @@
 
 package io.opentelemetry.instrumentation.api.incubator.semconv.messaging;
 
+import javax.annotation.Nullable;
 import io.opentelemetry.instrumentation.api.instrumenter.SpanNameExtractor;
+import io.opentelemetry.instrumentation.api.internal.SemconvStability;
 import io.opentelemetry.instrumentation.api.semconv.network.ServerAttributesGetter;
 
 public final class MessagingSpanNameExtractor<REQUEST> implements SpanNameExtractor<REQUEST> {
@@ -39,26 +41,42 @@ public final class MessagingSpanNameExtractor<REQUEST> implements SpanNameExtrac
 
   @Override
   public String extract(REQUEST request) {
+    if (SemconvStability.emitStableMessagingSemconv()) {
+      String destination = getDestination(request);
+      if (destination == null) {
+        return getter.getOperationName(request);
+      }
+      return getter.getOperationName(request) + " " + destination;
+    }
+    String destinationName =
+        getter.isTemporaryDestination(request)
+            ? MessagingAttributesExtractor.TEMP_DESTINATION_NAME
+            : getter.getDestination(request);
+    if (destinationName == null) {
+      destinationName = "unknown";
+    }
+
+    return destinationName + " " + operation.operationName();
+  }
+
+  @Nullable
+  private String getDestination(REQUEST request) {
+    String destination = null;
     if (getter.getDestinationTemplate(request) != null) {
-      return getter.getDestinationTemplate(request) + " " + operation.operationName();
+      destination = getter.getDestinationTemplate(request);
+    } else if (getter.isTemporaryDestination(request)) {
+      destination = MessagingAttributesExtractor.TEMP_DESTINATION_NAME;
+    } else if (getter.isAnonymousDestination(request)) {
+      destination = MessagingAttributesExtractor.ANONYMOUS_DESTINATION_NAME;
+    } else if (getter.getDestination(request) != null) {
+      destination = getter.getDestination(request);
+    } else {
+      if (serverAttributesGetter.getServerAddress(request) != null
+          && serverAttributesGetter.getServerPort(request) != null) {
+        destination = serverAttributesGetter.getServerAddress(request) + ":"
+            + serverAttributesGetter.getServerPort(request);
+      }
     }
-    if (getter.isTemporaryDestination(request)) {
-      return MessagingAttributesExtractor.TEMP_DESTINATION_NAME + " " + operation.operationName();
-    }
-    if (getter.isAnonymousDestination(request)) {
-      return MessagingAttributesExtractor.ANONYMOUS_DESTINATION_NAME + " "
-          + operation.operationName();
-    }
-    if (getter.getDestination(request) != null) {
-      return getter.getDestination(request) + " " + operation.operationName();
-    }
-
-    if (serverAttributesGetter.getServerAddress(request) != null
-        && serverAttributesGetter.getServerPort(request) != null) {
-      return serverAttributesGetter.getServerAddress(request) + ":"
-          + serverAttributesGetter.getServerPort(request) + " " + operation.operationName();
-    }
-
-    return operation.operationName();
+    return destination;
   }
 }

@@ -9,6 +9,7 @@ import com.google.auto.value.AutoValue;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.GetResponse;
 import javax.annotation.Nullable;
+import io.opentelemetry.instrumentation.api.internal.SemconvStability;
 
 @AutoValue
 public abstract class ReceiveRequest {
@@ -25,7 +26,20 @@ public abstract class ReceiveRequest {
   public abstract Connection getConnection();
 
   String spanName() {
+    if (SemconvStability.emitStableMessagingSemconv()) {
+
+      String destination
+
+
+    }
+
     String queue = getQueue();
-    return (queue.startsWith("amq.gen-") ? "<generated>" : queue) + " receive";
+    String destination = queue.startsWith("amq.gen-") ? "<generated>" : queue;
+
+    if (SemconvStability.emitStableMessagingSemconv()) {
+      return "receive " + destination;
+    } else {
+      return destination + " receive";
+    }
   }
 }
